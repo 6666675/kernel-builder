@@ -1,0 +1,11 @@
+.kernel-builder/
+.gki-state/
+gki-src/
+kernel-dist/
+kernel-out/
+artifact/
+dist/
+__pycache__/
+*.pyc
+.env
+

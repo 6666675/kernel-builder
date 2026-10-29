@@ -1,0 +1,29 @@
+$:
+  push:
+    - name: verify-builder
+      runner:
+        tags: cnb:arch:amd64
+        cpus: 4
+      docker:
+        build: Dockerfile
+      stages:
+        - name: Shell 和 Python 测试
+          script: bash tools/check.sh
+          timeout: 20m
+  web_trigger_image:
+    - name: publish-builder-image
+      runner:
+        tags: cnb:arch:amd64
+        cpus: 4
+      services:
+        - docker
+      stages:
+        - name: 构建并发布环境镜像
+          timeout: 1h
+          script: |
+            bash -euo pipefail <<'BASH'
+            image="$CNB_DOCKER_REGISTRY/$CNB_REPO_SLUG_LOWERCASE"
+            docker build --platform linux/amd64 -t "$image:$CNB_COMMIT" -t "$image:latest" .
+            docker push "$image:$CNB_COMMIT"
+            docker push "$image:latest"
+            BASH
